@@ -1,100 +1,53 @@
 ```mermaid
-stateDiagram-v2
-    [*] --> INIT
-    INIT --> WAIT_FOR_DOOR_OPEN
+flowchart TD
+    A[เริ่ม] --> B{ประตูสนามเปิด?}
+    B -->|ใช่| C[นำทางไปหาโต๊ะ]
+    B -->|ไม่| B
     
-    state WAIT_FOR_DOOR_OPEN {
-        [*] --> MONITOR_DOOR
-        MONITOR_DOOR --> NAVIGATE_TO_TABLE : เมื่อประตูเปิด
-    }
+    C --> D{เปิดตู้สำเร็จ?}
+    D -->|ใช่| E[สแกนวัตถุบนโต๊ะ]
+    D -->|ไม่| F[แจ้งกรรมการขอความช่วยเหลือ \n -200 คะแนน]
+    F --> D
     
-    state NAVIGATE_TO_TABLE {
-        [*] --> SCAN_AREA
-        SCAN_AREA --> LOCATE_TABLE : ตรวจจับโต๊ะ
-        LOCATE_TABLE --> MOVE_TO_TABLE
-        MOVE_TO_TABLE --> CONFIRM_TABLE : ยืนยันตำแหน่ง
-    }
+    E --> G[เลือกวัตถุตามยุทธศาสตร์:\n 1. วัตถุหนัก > 2. วัตถุเล็ก > 3. วัตถุทั่วไป]
+    G --> H[ตรวจจับคุณสมบัติวัตถุ:\n - รูปร่าง\n - สี\n - พื้นผิว]
     
-    NAVIGATE_TO_TABLE --> OPEN_CABINET
+    H --> I{วัตถุมีกลุ่มในตู้?}
+    I -->|ใช่| J[ระบุตำแหน่งชั้นที่ตรงกลุ่ม]
+    I -->|ไม่| K[สร้างชั้นใหม่]
     
-    state OPEN_CABINET {
-        [*] --> DETECT_DOOR_HANDLE
-        DETECT_DOOR_HANDLE --> GRASP_HANDLE
-        GRASP_HANDLE --> APPLY_TORQUE : ดึงประตู
-        APPLY_TORQUE --> CHECK_OPEN_STATUS
-        
-        state CHECK_OPEN_STATUS {
-            [*] --> VERIFY_GAP
-            VERIFY_GAP --> REQUEST_HELP : หากเปิดไม่สำเร็จ
-            VERIFY_GAP --> PROCEED : หากเปิดสำเร็จ
-        }
-    }
+    J --> L[หยิบวัตถุ]
+    K --> L
     
-    OPEN_CABINET --> POUR_CEREAL
+    L --> M{วัตถุพิเศษ?}
+    M -->|วัตถุหนัก| N[ใช้ Gripper แรงสูง \n +70 คะแนน]
+    M -->|วัตถุเล็ก| O[ใช้ Gripper แรงเบา \n +70 คะแนน]
+    M -->|ทั่วไป| P[ใช้ Gripper มาตรฐาน]
     
-    state POUR_CEREAL {
-        [*] --> LOCATE_CEREAL
-        LOCATE_CEREAL --> GRASP_BOX
-        GRASP_BOX --> ALIGN_CONTAINER
-        ALIGN_CONTAINER --> CONTROL_POUR_ANGLE
-        CONTROL_POUR_ANGLE --> MONITOR_SPILL
-    }
+    N --> Q[วางบนชั้น]
+    O --> Q
+    P --> Q
     
-    POUR_CEREAL --> STORE_OBJECTS
+    Q --> R{วางถูกกลุ่ม?}
+    R -->|ใช่| S[+50 คะแนน]
+    R -->|ไม่| T[-15 คะแนน]
     
-    state STORE_OBJECTS {
-        [*] --> SCAN_TABLE_OBJECTS
-        
-        state SCAN_TABLE_OBJECTS {
-            [*] --> DETECT_ALL_OBJECTS
-            DETECT_ALL_OBJECTS --> CLUSTER_BY_FEATURES
-            CLUSTER_BY_FEATURES --> GENERATE_STRATEGY
-        }
-        
-        SCAN_TABLE_OBJECTS --> PROCESS_OBJECT
-        
-        state PROCESS_OBJECT {
-            [*] --> SELECT_OBJECT : เลือกตามน้ำหนัก/ขนาด
-            SELECT_OBJECT --> ANALYZE_SIMILARITY
-            ANALYZE_SIMILARITY --> PICK_OBJECT
-            PICK_OBJECT --> MOVE_TO_SHELF
-            MOVE_TO_SHELF --> PLACE_OBJECT
-        }
-        
-        PROCESS_OBJECT --> UPDATE_INVENTORY
-        UPDATE_INVENTORY --> CHECK_REMAINING : ยังมีวัตถุเหลือ?
-    }
+    S --> U[อัปเดตแผนที่ชั้น]
+    T --> U
     
-    STORE_OBJECTS --> HANDLE_BAG
+    U --> V{ยังมีวัตถุบนโต๊ะ?}
+    V -->|ใช่| G
+    V -->|ไม่| W{หยิบวัตถุจากถุง? \n +30 คะแนน}
     
-    state HANDLE_BAG {
-        [*] --> LOCATE_BAG : หาถุงช้อปปิ้ง
-        LOCATE_BAG --> DETECT_BAG_OPENING
-        DETECT_BAG_OPENING --> RETRIEVE_OBJECT : ดึงวัตถุ
-        RETRIEVE_OBJECT --> CLASSIFY_OBJECT : จำแนกประเภท
-    }
+    W -->|ใช่| X[ดึงวัตถุจากถุง]
+    X --> H
+    W -->|ไม่| Y[ตรวจสอบความสมบูรณ์]
     
-    HANDLE_BAG --> FINAL_VERIFICATION
-    FINAL_VERIFICATION --> [*]
+    Y --> Z[จบภารกิจ]
     
-    %% Error handling transitions
-    CHECK_OPEN_STATUS --> REQUEST_HELP : ประตูไม่เปิด\n(3 ครั้งล้มเหลว)
-    MONITOR_SPILL --> ABORT_POUR : ซีเรียลหก >10%
-    PLACE_OBJECT --> SKIP_OBJECT : การวางล้มเหลว\n(2 ครั้ง)
-    
-    state REQUEST_HELP {
-        [*] --> TTS_ALERT : "เปิดตู้ล้มเหลว กรุณาช่วยเหลือ"
-        TTS_ALERT --> WAIT_FOR_HUMAN
-        WAIT_FOR_HUMAN --> RESUME : เมื่อประตูเปิดแล้ว
-    }
-    
-    state ABORT_POUR {
-        [*] --> SAFE_DROP : วางกล่องซีเรียล
-        SAFE_DROP --> RECORD_PENALTY : บันทึกการหักคะแนน
-    }
-    
-    state SKIP_OBJECT {
-        [*] --> LOG_FAILURE : บันทึกวัตถุที่ข้าม
-        LOG_FAILURE --> NEXT_ITEM : ไปวัตถุถัดไป
-    }
+    %% Error handling
+    L -->|หยิบล้มเหลว >2 ครั้ง| L1[ข้ามวัตถุนี้]
+    L1 --> V
+    Q -->|วางล้มเหลว| Q1[ลองใหม่]
+    Q1 -->|ล้มเหลวซ้ำ| L1
 ```
