@@ -1,6 +1,6 @@
 # RoboCup@Home Task State Flowchart
 
-Repository รวบรวม flowchart task ต่างๆ ใน RoboCup@Home Competition โดยใช้ Mermaid Chart เพื่อแสดงผัง State Flow ของแต่ละ Task
+Repository รวบรวม flowchart task ต่างๆ ใน RoboCup@Home โดยใช้ Mermaid Chart เพื่อแสดงผัง State Flow ของแต่ละ Task
 
 ---
 
