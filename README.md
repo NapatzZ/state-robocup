@@ -6,7 +6,7 @@ Repository รวบรวม flowchart task ต่างๆ ใน RoboCup@Home
 
 ## 📋 Task Documentation
 
-### Restaurant [Restaurant.md]
+### Restaurant 
 
 **Task Description**: Robot ทำหน้าที่เป็นพนักงานเสิร์ฟในร้านอาหาร โดยต้องตรวจจับลูกค้าที่เรียก รับออเดอร์ และนำอาหารไปเสิร์ฟ
 
@@ -23,7 +23,7 @@ Repository รวบรวม flowchart task ต่างๆ ใน RoboCup@Home
 - ใช้เวลาสูงสุด 15 นาที
 - คะแนนเต็ม 2000 คะแนน
 
-**🔗 Link to Flowchart**: [Restaurant.mmd](charts/stage_2/restaurant.mmd)
+**🔗 Link to Flowchart**: [Restaurant.md](Restaurant.md)
 
 ---
 
@@ -48,6 +48,6 @@ Repository รวบรวม flowchart task ต่างๆ ใน RoboCup@Home
 - ใช้เวลาสูงสุด 7 นาที
 - คะแนนเต็ม 1890 คะแนน
 
-**🔗 Link to Flowchart**: [StoringGroceries.mmd](charts/stage_1/storing_groceries.mmd)
+**🔗 Link to Flowchart**: [StoringGroceries.md](StoringGroceries.md)
 
 ---
